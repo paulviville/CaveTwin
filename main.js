@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 
 import Stats from 'three/addons/libs/stats.module.js';
+import { GUI } from 'three/addons/libs/lil-gui.module.min.js'; 
 
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
@@ -9,6 +10,8 @@ import Screen from './Screen.js';
 import ScreenHelper from './ScreenHelper.js';
 import Cave from './Cave.js';
 import CaveHelper from './CaveHelper.js';
+import StereoScreenCamera from './StereoScreenCamera.js';
+import StereoScreenCameraHelper from './StereoScreenCameraHelper.js';
 
 // const socket = new WebSocket("ws://localhost:8000");
 // socket.addEventListener("message", (event) => {
@@ -107,3 +110,67 @@ const screen2 = new Screen(screenCorners2);
 const cave = new Cave([screen0, screen1, screen2]);
 const caveHelper = new CaveHelper(cave);
 scene.add(caveHelper);
+
+
+
+// const cameraMarker = new THREE.Mesh(new THREE.SphereGeometry(0.05, 16, 16), new THREE.MeshBasicMaterial({color: 0xff0000}));
+// scene.add(cameraMarker)
+
+const targetPoint = new THREE.Vector3(-1.5, PDS, 1.2)
+
+const trackedCamera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 0.5 );
+trackedCamera.up.copy(worldUp);
+trackedCamera.position.set(0.5, -0.1, 1);
+trackedCamera.lookAt(targetPoint)
+trackedCamera.updateProjectionMatrix();
+
+trackedCamera.updateWorldMatrix();
+
+const stereoScreenCamera0 = new StereoScreenCamera(screen0);
+const stereoScreenCamera1 = new StereoScreenCamera(screen1);
+const stereoScreenCamera2 = new StereoScreenCamera(screen2);
+const stereoScreenCameraHelper0 = new StereoScreenCameraHelper(stereoScreenCamera0);
+const stereoScreenCameraHelper1 = new StereoScreenCameraHelper(stereoScreenCamera1);
+const stereoScreenCameraHelper2 = new StereoScreenCameraHelper(stereoScreenCamera2);
+scene.add(stereoScreenCameraHelper0);
+scene.add(stereoScreenCameraHelper1);
+scene.add(stereoScreenCameraHelper2);
+stereoScreenCameraHelper0.update(trackedCamera.matrixWorld.clone());
+stereoScreenCameraHelper1.update(trackedCamera.matrixWorld.clone());
+stereoScreenCameraHelper2.update(trackedCamera.matrixWorld.clone());
+
+// trackedCamera.position.set(0, 0, 1);
+// trackedCamera.lookAt(new THREE.Vector3(0, PDS, 1.2))
+// trackedCamera.updateProjectionMatrix();
+
+// trackedCamera.updateWorldMatrix();
+// stereoScreenCameraHelper0.update(trackedCamera.matrixWorld.clone());
+// stereoScreenCameraHelper1.update(trackedCamera.matrixWorld.clone());
+// stereoScreenCameraHelper2.update(trackedCamera.matrixWorld.clone());
+
+const trackedCameraHelper = new THREE.CameraHelper(trackedCamera);
+scene.add(trackedCameraHelper);
+
+function updateRig() {
+  trackedCamera.lookAt(targetPoint);
+  trackedCamera.updateProjectionMatrix();
+  trackedCamera.updateWorldMatrix();
+  trackedCameraHelper.update();
+  stereoScreenCameraHelper0.update(trackedCamera.matrixWorld.clone());
+  stereoScreenCameraHelper1.update(trackedCamera.matrixWorld.clone());
+  stereoScreenCameraHelper2.update(trackedCamera.matrixWorld.clone());
+}
+
+const guiParams  = {
+  updateRig: updateRig,
+}
+
+const gui = new GUI();
+gui.add(trackedCamera.position, 'x').name("x").min(-1.0).max(1.0).step(0.05).onChange(updateRig);
+gui.add(trackedCamera.position, 'y').name("y").min(-PDS).max(PDS).step(0.05).onChange(updateRig);
+gui.add(trackedCamera.position, 'z').name("z").min(0.05).max(2.0).step(0.05).onChange(updateRig);
+gui.add(targetPoint, 'x').name('tx').min(-10.0).max(10.0).step(0.05).onChange(updateRig);
+gui.add(targetPoint, 'y').name('ty').min(-10.0).max(10.0).step(0.05).onChange(updateRig);
+gui.add(targetPoint, 'z').name('tz').min(-10.0).max(10.0).step(0.05).onChange(updateRig);
+
+window.updateRig = updateRig;

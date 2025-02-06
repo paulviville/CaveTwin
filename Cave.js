@@ -1,14 +1,24 @@
 import * as THREE from 'three';
+import StereoCamera from './StereoScreenCamera.js';
 
 export default class Cave {
 	#screens;
+	#stereoScreenCameras;
 
-	constructor( screens ) {
+	constructor ( screens ) {
 		this.#screens = [...screens];
 
+		this.#stereoScreenCameras = [];
+		for( const screen of screens ) {
+			// this.#stereoScreenCameras.push(new StereoCamera(screen));
+		}
 	}
 
-	get screens () {
+	get screens ( ) {
 		return this.#screens;
+	}
+
+	get stereoScreenCameras ( ) {
+		return this.#stereoScreenCameras;
 	}
 }

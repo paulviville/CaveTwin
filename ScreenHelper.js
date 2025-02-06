@@ -15,10 +15,8 @@ export default class ScreenHelper extends Object3D {
 		this.#screen = screen;
 
 		const corners = screen.corners;
-		console.log(corners);
 
 		const indices = [ 0, 1, 2,	1, 3, 2  ]
-
 		const vertices = new Float32Array([
 			...corners[0].toArray(),
 			...corners[1].toArray(),
