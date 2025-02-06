@@ -9,6 +9,8 @@ export default class StereoScreenCameraHelper extends Object3D{
 
 	constructor ( stereoCamera, color = new Color(0xffffff) ) {
 		super();
+		this.type = 'StereoScreenCameraHelper';
+
 		this.#stereoScreenCamera = stereoCamera;
 	
 		this.#leftCameraHelper = new CameraHelper(this.#stereoScreenCamera.left);
