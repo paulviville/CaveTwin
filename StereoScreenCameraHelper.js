@@ -1,5 +1,5 @@
 import StereoCamera from "./StereoScreenCamera.js";
-import { Object3D } from "three";
+import { Object3D, Color } from "three";
 import { CameraHelper } from "./three.module.js";
 
 export default class StereoScreenCameraHelper extends Object3D{
@@ -7,18 +7,20 @@ export default class StereoScreenCameraHelper extends Object3D{
 	#leftCameraHelper;
 	#rightCameraHelper;
 
-	constructor ( stereoCamera ) {
+	constructor ( stereoCamera, color = new Color(0xffffff) ) {
 		super();
 		this.#stereoScreenCamera = stereoCamera;
 	
 		this.#leftCameraHelper = new CameraHelper(this.#stereoScreenCamera.left);
 		this.#rightCameraHelper = new CameraHelper(this.#stereoScreenCamera.right);
-	
+ 
+		this.#leftCameraHelper.setColors(color, color, color, color, color);
+		this.#rightCameraHelper.setColors(color, color, color, color, color);
+
 		this.add(this.#leftCameraHelper, this.#rightCameraHelper);
 	}
 
-	update ( headMatrix ) {
-		this.#stereoScreenCamera.update(headMatrix);
+	update ( ) {
 		this.#leftCameraHelper.update();
 		this.#rightCameraHelper.update();
 	}

@@ -10,7 +10,7 @@ export default class Cave {
 
 		this.#stereoScreenCameras = [];
 		for( const screen of screens ) {
-			// this.#stereoScreenCameras.push(new StereoCamera(screen));
+			this.#stereoScreenCameras.push(new StereoCamera(screen));
 		}
 	}
 
@@ -20,5 +20,11 @@ export default class Cave {
 
 	get stereoScreenCameras ( ) {
 		return this.#stereoScreenCameras;
+	}
+
+	updateStereoScreenCameras ( headMatrix ) {
+		for( const stereoScreenCamera of this.#stereoScreenCameras ) {
+			stereoScreenCamera.update(headMatrix);
+		}
 	}
 }

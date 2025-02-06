@@ -6,9 +6,6 @@ export default class StereoScreenCamera {
 
 	#eyeSeparation = 0.064;
 
-	#position = new THREE.Vector3();
-	#quaternion = new THREE.Quaternion();
-	
 	#left = new THREE.PerspectiveCamera();
 	#right = new THREE.PerspectiveCamera();
 
@@ -23,20 +20,6 @@ export default class StereoScreenCamera {
 		this.#screen = screen;
 
 		this.#computeScreenSpace();
-	}
-
-	get worldMatrix ( ) {
-
-		// m4d << r[0], r[4], r[8], t.pos[0], r[1], r[5], r[9], t.pos[1], r[2], r[6], r[10], t.pos[2], 0.0f, 0.0f, 0.0f, 1;
-		// CaveViewer::head_matrix_s_ = m4d.cast<float>();
-	}
-
-	set position ( position ) {
-		this.#position.copy(position);
-	}
-
-	set quaternion ( quaternion ) {
-		this.#quaternion.copy(quaternion);
 	}
 
 	get left ( ) {

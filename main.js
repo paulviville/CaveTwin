@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-
+import { Vector3 } from './three.module.js';
 import Stats from 'three/addons/libs/stats.module.js';
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js'; 
 
@@ -35,7 +35,7 @@ let pointLight0 = new THREE.PointLight(0xffffff, 100);
 pointLight0.position.set(5,4,5);
 scene.add(pointLight0);
 
-const worldUp = new THREE.Vector3(0, 0, 1);
+const worldUp = new Vector3(0, 0, 1);
 
 
 const camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 50 );
@@ -74,33 +74,33 @@ renderer.setAnimationLoop( animate );
 const PDS = Math.sqrt(2) * 1.8;
 
 const screenCoords = [
-  [new THREE.Vector3(-PDS, 0, 0), new THREE.Vector3(0, PDS, 0), new THREE.Vector3(-PDS, 0, 2.25)],
-  [new THREE.Vector3(0, PDS, 0), new THREE.Vector3(PDS, 0, 0), new THREE.Vector3(0, PDS, 2.25)],
-  [new THREE.Vector3(-PDS + 1.194, 1.194), new THREE.Vector3(0.62, -0.82, 0), new THREE.Vector3(-0.21, PDS - 0.21, 0)]
+  [new Vector3(-PDS, 0, 0), new Vector3(0, PDS, 0), new Vector3(-PDS, 0, 2.25)],
+  [new Vector3(0, PDS, 0), new Vector3(PDS, 0, 0), new Vector3(0, PDS, 2.25)],
+  [new Vector3(-PDS + 1.194, 1.194), new Vector3(0.62, -0.82, 0), new Vector3(-0.21, PDS - 0.21, 0)]
 ]
 
 
-const t = new THREE.Vector3(1, 1, 0).normalize().multiplyScalar(2.25);
+const t = new Vector3(1, 1, 0).normalize().multiplyScalar(2.25);
 
 const screenCorners0 = [
-  new THREE.Vector3(-PDS, 0, 0),
-  new THREE.Vector3(0, PDS, 0),
-  new THREE.Vector3(-PDS, 0, 2.25),
-  new THREE.Vector3(0, PDS, 2.25),
+  new Vector3(-PDS, 0, 0),
+  new Vector3(0, PDS, 0),
+  new Vector3(-PDS, 0, 2.25),
+  new Vector3(0, PDS, 2.25),
 ];
 
 const screenCorners1 = [
-  new THREE.Vector3(0, PDS, 0),
-  new THREE.Vector3(PDS, 0, 0),
-  new THREE.Vector3( 0, PDS, 2.25),
-  new THREE.Vector3( PDS, 0, 2.25),
+  new Vector3(0, PDS, 0),
+  new Vector3(PDS, 0, 0),
+  new Vector3( 0, PDS, 2.25),
+  new Vector3( PDS, 0, 2.25),
 ];
 
 const screenCorners2 = [
-  new THREE.Vector3(-t.x, PDS - t.y, 0),
-  new THREE.Vector3(PDS - t.x, -t.y, 0),
-  new THREE.Vector3(0, PDS, 0),
-  new THREE.Vector3(PDS, 0, 0),
+  new Vector3(-t.x, PDS - t.y, 0),
+  new Vector3(PDS - t.x, -t.y, 0),
+  new Vector3(0, PDS, 0),
+  new Vector3(PDS, 0, 0),
 ];
 
 const screen0 = new Screen(screenCorners0);
@@ -112,41 +112,16 @@ const caveHelper = new CaveHelper(cave);
 scene.add(caveHelper);
 
 
-
-// const cameraMarker = new THREE.Mesh(new THREE.SphereGeometry(0.05, 16, 16), new THREE.MeshBasicMaterial({color: 0xff0000}));
-// scene.add(cameraMarker)
-
-const targetPoint = new THREE.Vector3(-1.5, PDS, 1.2)
+const targetPoint = new Vector3(-1.5, PDS, 1.2)
 
 const trackedCamera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 0.5 );
 trackedCamera.up.copy(worldUp);
 trackedCamera.position.set(0.5, -0.1, 1);
 trackedCamera.lookAt(targetPoint)
 trackedCamera.updateProjectionMatrix();
-
 trackedCamera.updateWorldMatrix();
 
-const stereoScreenCamera0 = new StereoScreenCamera(screen0);
-const stereoScreenCamera1 = new StereoScreenCamera(screen1);
-const stereoScreenCamera2 = new StereoScreenCamera(screen2);
-const stereoScreenCameraHelper0 = new StereoScreenCameraHelper(stereoScreenCamera0);
-const stereoScreenCameraHelper1 = new StereoScreenCameraHelper(stereoScreenCamera1);
-const stereoScreenCameraHelper2 = new StereoScreenCameraHelper(stereoScreenCamera2);
-scene.add(stereoScreenCameraHelper0);
-scene.add(stereoScreenCameraHelper1);
-scene.add(stereoScreenCameraHelper2);
-stereoScreenCameraHelper0.update(trackedCamera.matrixWorld.clone());
-stereoScreenCameraHelper1.update(trackedCamera.matrixWorld.clone());
-stereoScreenCameraHelper2.update(trackedCamera.matrixWorld.clone());
 
-// trackedCamera.position.set(0, 0, 1);
-// trackedCamera.lookAt(new THREE.Vector3(0, PDS, 1.2))
-// trackedCamera.updateProjectionMatrix();
-
-// trackedCamera.updateWorldMatrix();
-// stereoScreenCameraHelper0.update(trackedCamera.matrixWorld.clone());
-// stereoScreenCameraHelper1.update(trackedCamera.matrixWorld.clone());
-// stereoScreenCameraHelper2.update(trackedCamera.matrixWorld.clone());
 
 const trackedCameraHelper = new THREE.CameraHelper(trackedCamera);
 scene.add(trackedCameraHelper);
@@ -156,13 +131,16 @@ function updateRig() {
   trackedCamera.updateProjectionMatrix();
   trackedCamera.updateWorldMatrix();
   trackedCameraHelper.update();
-  stereoScreenCameraHelper0.update(trackedCamera.matrixWorld.clone());
-  stereoScreenCameraHelper1.update(trackedCamera.matrixWorld.clone());
-  stereoScreenCameraHelper2.update(trackedCamera.matrixWorld.clone());
+  
+  cave.updateStereoScreenCameras(trackedCamera.matrixWorld.clone());
+  caveHelper.updateStereoScreenCameraHelpers();
 }
 
-const guiParams  = {
-  updateRig: updateRig,
+updateRig()
+
+const guiParams = {
+  hideCameraHelpers: caveHelper.hideStereoScreenCameraHelpers.bind(caveHelper),
+  showCameraHelpers: caveHelper.showStereoScreenCameraHelpers.bind(caveHelper),
 }
 
 const gui = new GUI();
@@ -172,5 +150,5 @@ gui.add(trackedCamera.position, 'z').name("z").min(0.05).max(2.0).step(0.05).onC
 gui.add(targetPoint, 'x').name('tx').min(-10.0).max(10.0).step(0.05).onChange(updateRig);
 gui.add(targetPoint, 'y').name('ty').min(-10.0).max(10.0).step(0.05).onChange(updateRig);
 gui.add(targetPoint, 'z').name('tz').min(-10.0).max(10.0).step(0.05).onChange(updateRig);
-
-window.updateRig = updateRig;
+gui.add(guiParams, "hideCameraHelpers");
+gui.add(guiParams, "showCameraHelpers");
