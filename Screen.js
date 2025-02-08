@@ -7,7 +7,6 @@ import { Vector3, Matrix4 } from 'three';
 
 export default class Screen {
 	#corners;
-	#ssAxes = {x: new Vector3(), y: new Vector3(), z: new Vector3()};
 
 	constructor ( corners ) {
 		this.#corners = [new Vector3(-1, -1, 0), new Vector3(1, -1, 0), new Vector3(-1, 1, 0), new Vector3(1, 1, 0)];

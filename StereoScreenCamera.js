@@ -87,9 +87,9 @@ export default class StereoScreenCamera {
 
 		const dist = - eye0.dot(this.#ssZ);
 
-		const nearCP = 0.01;
-		// const farCP = 10.0;
-		const farCP = dist;
+		const nearCP = 0.1;
+		const farCP = 50.0;
+		// const farCP = dist;
 		const ND = nearCP / dist;
 
 		const l = this.#ssX.dot(eye0) * ND;
