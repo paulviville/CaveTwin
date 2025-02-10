@@ -12,12 +12,7 @@ import CaveHelper from './CaveHelper.js';
 
 import initScene from './sceneDescriptor.js';
 
-// const socket = new WebSocket("ws://localhost:8000");
-// socket.addEventListener("message", (event) => {
-//     console.log("Message from server ", event.data);
-//   });
 
-// console.log(socket)
 
 
 
@@ -41,6 +36,15 @@ renderer.setPixelRatio( window.devicePixelRatio );
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
 
+// const offscreenCanvas = new OffscreenCanvas(window.innerWidth, window.innerHeight);
+// const renderer2 = new THREE.WebGLRenderer({canvas: offscreenCanvas, antialias: true});
+// renderer2.autoClear = false;
+// renderer2.setPixelRatio( window.devicePixelRatio );
+// renderer2.setSize( window.innerWidth, window.innerHeight );
+// document.body.appendChild( renderer2.domElement );
+
+
+
 const orbitControls = new OrbitControls(camera, renderer.domElement);
 orbitControls.target.set(0, 0, 2);
 orbitControls.update()
@@ -55,10 +59,23 @@ window.addEventListener('resize', function() {
 });
 
 
+let first = true;
 function animate() {
   orbitControls.update()
   renderer.render( scene, camera );
   stats.update()
+
+  // if(first) {
+  //   first = false;
+  //   renderer2.render(scene, camera);
+  //   let context = offscreenCanvas.getContext('webgl2');
+  //   // offscreenCanvas.convertToBlob().then(blob => {
+  //   //   // console.log(blob);
+  //   //   tertiaryWindow.postMessage(blob, '*');
+  //   // });
+  //   // // console.log(context)
+
+  // }
 }
 
 renderer.setAnimationLoop( animate );
@@ -71,6 +88,8 @@ const PDS = Math.sqrt(2) * 1.8;
 //   [new Vector3(0, PDS, 0), new Vector3(PDS, 0, 0), new Vector3(0, PDS, 2.25)],
 //   [new Vector3(-PDS + 1.194, 1.194), new Vector3(0.62, -0.82, 0), new Vector3(-0.21, PDS - 0.21, 0)]
 // ]
+
+
 
 
 const t = new Vector3(1, 1, 0).normalize().multiplyScalar(2.25);
@@ -140,8 +159,22 @@ function updateRigAndTransmit() {
 const sceneContent = initScene();
 scene.add(sceneContent)
 
+let socket = null;
+
+// const socket = new WebSocket("ws://localhost:8000");
+// socket.addEventListener("message", (event) => {
+//     console.log("Message from server ", event.data);
+//   });
+
+// console.log(socket)
 
 const guiParams = {
+  connectTracking: () => {
+    socket = new WebSocket("ws://localhost:8000");
+    socket.addEventListener("message", (event) => {
+        console.log("Message from server ", event.data);
+      });
+  },
   hideCameraHelpers: caveHelper.hideStereoScreenCameraHelpers.bind(caveHelper),
   showCameraHelpers: caveHelper.showStereoScreenCameraHelpers.bind(caveHelper),
   showScene: () => {scene.add(sceneContent)},
@@ -249,6 +282,8 @@ const secondaryWindow1 = window.open("secondary.html?id=1", '', features1);
 const secondaryWindow2 = window.open("secondary.html?id=2", '', features2);
 const secondaryWindow3 = window.open("secondary.html?id=3", '', features3);
 
+// const tertiaryWindow = window.open("tertiary.html?id=3", '', features3);
+
 
 window.addEventListener("beforeunload", () => {
   worker.port.postMessage({type: 'terminate', data: 0});
@@ -256,6 +291,7 @@ window.addEventListener("beforeunload", () => {
   secondaryWindow1.close();
   secondaryWindow2.close();
   secondaryWindow3.close();
+  // tertiaryWindow.close();
 });
 
 worker.port.postMessage({type: 'init', data: 0});

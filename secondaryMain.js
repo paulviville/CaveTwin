@@ -108,15 +108,24 @@ orbitControls.update()
 
 scene.add(initScene())
 
-// window.addEventListener('resize', function() {
-//   const width = window.innerWidth;
-//   const height = window.innerHeight;
-//   renderer.setSize(width, height);
-//   camera.aspect = width / height;
-//   camera.updateProjectionMatrix();
-// });
+window.addEventListener('resize', function() {
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  renderer.setSize(width, height);
+  camera.aspect = width / height;
+  camera.updateProjectionMatrix();
+});
 
 let left = true;
+const guiParams = {
+	flip : () => {
+		left = !left;
+	}
+}
+const gui = new GUI();
+gui.add(guiParams, "flip");
+
+
 function animate() {
 	// orbitControls.update()
 	renderer.render( scene, left ? cameraL : cameraR );
